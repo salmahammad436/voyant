@@ -1,20 +1,23 @@
 {
   "compilerOptions": {
-   
     "lib": ["ESNext", "DOM"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
-
-    // Bundler mode
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "target": "ES6",
+    "strict": true
+  ,
+   
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
 
-    // Best practices
+    // Best practice
     "strict": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
@@ -23,14 +26,6 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  },
-  {
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "module": "ESNext",
-    "target": "ES6",
-    "strict": true
   }
-}
 
 }

@@ -24,7 +24,7 @@ Bun.serve({
 				return await getAllWebsites(req);
 			case `GET /api/websites/${url.pathname.split("/").slice(3).join("/")}`:
 				return await getOneById(req);
-			case `POST /api/websites/${url.pathname.split("/").slice(3).join("/")}/analyze`:
+			case `POST /api/websites/${url.pathname.split("/").slice(3).join("/")}`:
 				return await createNewAnalysis(req);
 			default:
 				return new Response("Not Found", { status: 404 });
@@ -41,4 +41,4 @@ connectDB()
   .catch((error) => {
     console.error('Database connection failed:', error);
     process.exit(1);
-  });
+  })
