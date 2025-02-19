@@ -1,9 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
 const WebsiteSchema = new Schema({
-  url: { type: String, required: true },
-  name: { type: String, required: true },
-
+	url: { type: String, required: true },
+	name: { type: String, required: true },
 });
 
 const Website = mongoose.model("Website", WebsiteSchema);
