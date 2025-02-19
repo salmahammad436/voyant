@@ -1,9 +1,10 @@
 import Website from "../models/webModel";
 import WebsiteAnalysis from "../models/webAnalysisModel";
-import { Voyant } from "voyant";
+import  Voyant  from "voyant";
+import type { AnyARecord } from "dns";
 
 // Get all websites
-const getAllWebsites = async (req) => {
+const getAllWebsites = async (req:Request) => {
   try {
     const websites = await Website.find();
     return websites;
@@ -14,7 +15,7 @@ const getAllWebsites = async (req) => {
 };
 
 // Get one website by ID
-const getOneById = async (req) => {
+const getOneById = async (req:Request) => {
   const { id } = req.params;
   try {
     const website = await Website.findById(id);
@@ -29,9 +30,9 @@ const getOneById = async (req) => {
 };
 
 // Create new analysis for a website
-const createNewAnalysis = async (req) => {
+const createNewAnalysis = async (req:Request) => {
   const { id } = req.params;
-  const { url, name } = req.body;
+  const { url, name} = req.body;
   try {
     const website = await Website.findById(id);
     if (!website) {
@@ -55,7 +56,7 @@ const createNewAnalysis = async (req) => {
     });
 
     await analysis.save();
-    return JSON.stringify(analysis); // Fixed typo here
+    return JSON.stringify(analysis);
   } catch (error) {
     console.error("Error creating new analysis", error);
     return { message: "Error creating analysis" };
@@ -65,7 +66,7 @@ const createNewAnalysis = async (req) => {
 // Function to run Voyant analysis
 const runVoyantAnalysis = async (url) => {
   try {
-    const analysis = new Voyant(url);
+    const analysis =  Voyant(url);
     const result = await analysis.run();
     return result;
   } catch (error) {

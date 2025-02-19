@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "autoprefixer": "^10.4.20",
+    "axios": "^1.7.9",
+    "biome": "^0.3.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "mongoose": "^8.10.1",
+    "node-cron": "^3.0.3",
+    "postcss": "^8.5.2",
+    "puppeteer": "^24.2.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.2.0",
+    "tailwindcss": "^4.0.6",
+    "voyant": "^3.2.1"
+  },
+  "scripts": {
+    "dev": "bun  run  server.ts --watch"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

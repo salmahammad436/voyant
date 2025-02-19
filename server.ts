@@ -1,13 +1,14 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import type { BunRequest } from 'bun';
-import connectDB from './backend/config/db';
-import { getAllWebsites, getOneById, createNewAnalysis } from './backend/controllers/index';
+import connectDB from './config/db';
+import { getAllWebsites, getOneById, createNewAnalysis } from './controllers/index';
+import { serve } from "bun";
+import { readFile } from "fs/promises";
 
 
 
 Bun.serve({
-  async fetch(req: Request) {
+  async fetch(req: Request):Promise<Response |String> {
     const url = new URL(req.url);
     const path = url.pathname;
     
@@ -19,19 +20,19 @@ Bun.serve({
   
 
     try {
-      // Match /api/websites
+     
       if (path === '/api/websites' && req.method === 'GET') {
         return await getAllWebsites(req);
       }
 
-      // Match /api/websites/:id
+     
       const websiteMatch = path.match(/^\/api\/websites\/([^\/]+)$/);
       if (websiteMatch && req.method === 'GET') {
         params.id = websiteMatch[1];
         return await getOneById(req);
       }
 
-      // Match /api/websites/:id/analyze
+
       const analysisMatch = path.match(/^\/api\/websites\/([^\/]+)\/analyze$/);
       if (analysisMatch && req.method === 'POST') {
         params.id = analysisMatch[1];
@@ -44,6 +45,16 @@ Bun.serve({
         { status: 404 }
       );
 
+
+      if (url.pathname === "/") {
+        const html = await readFile("public/index.html", "utf-8");
+        return new Response(html, { headers: { "Content-Type": "text/html" } });
+    }  
+
+    if (url.pathname.endsWith(".tsx")) {
+      return new Response(Bun.file(`src${url.pathname}`));
+  }
+  
     } catch (error) {
       console.error('Server error:', error);
       return new Response(
