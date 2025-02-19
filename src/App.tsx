@@ -1,13 +1,13 @@
-import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './components/home'
 
-export default function App() {
+const App:React.FC=()=>{
     return (
-        <Router>
-            <Routes>
-              <Home/> 
-            </Routes>
-        </Router>
-    );
+        <>
+        <Home/>
+        </>
+    )
 }
+export default App;
+
