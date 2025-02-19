@@ -8,63 +8,62 @@ import { readFile } from "fs/promises";
 
 
 Bun.serve({
-  async fetch(req: Request):Promise<Response |String> {
+  async fetch(req: Request): Promise<Response> {
     const url = new URL(req.url);
     const path = url.pathname;
-    
-    if (!path.startsWith('/api')) {
-      return new Response('Not Found', { status: 404 });
-    }
 
-    const params: Record<string, string> = {};
   
-
-    try {
-     
-      if (path === '/api/websites' && req.method === 'GET') {
-        return await getAllWebsites(req);
-      }
-
-     
-      const websiteMatch = path.match(/^\/api\/websites\/([^\/]+)$/);
-      if (websiteMatch && req.method === 'GET') {
-        params.id = websiteMatch[1];
-        return await getOneById(req);
-      }
-
-
-      const analysisMatch = path.match(/^\/api\/websites\/([^\/]+)\/analyze$/);
-      if (analysisMatch && req.method === 'POST') {
-        params.id = analysisMatch[1];
-        const body = await req.json();
-        return await createNewAnalysis(req);
-      }
-
-      return new Response(
-        JSON.stringify({ message: 'Endpoint not found' }), 
-        { status: 404 }
-      );
-
-
-      if (url.pathname === "/") {
+    if (path === "/") {
+      try {
         const html = await readFile("public/index.html", "utf-8");
         return new Response(html, { headers: { "Content-Type": "text/html" } });
-    }  
-
-    if (url.pathname.endsWith(".tsx")) {
-      return new Response(Bun.file(`src${url.pathname}`));
-  }
-  
-    } catch (error) {
-      console.error('Server error:', error);
-      return new Response(
-        JSON.stringify({ message: 'Internal server error' }), 
-        { status: 500 }
-      );
+      } catch (error) {
+        console.error("Error loading index.html:", error);
+        return new Response("Internal Server Error", { status: 500 });
+      }
     }
+
+  
+    if (path.endsWith(".tsx")) {
+      return new Response(Bun.file(`src${path}`));
+    }
+
+    if (path.startsWith('/api')) {
+      try {
+        if (path === '/api/websites' && req.method === 'GET') {
+          return await getAllWebsites(req);
+        }
+
+        const websiteMatch = path.match(/^\/api\/websites\/([^\/]+)$/);
+        if (websiteMatch && req.method === 'GET') {
+          return await getOneById(req);
+        }
+
+        const analysisMatch = path.match(/^\/api\/websites\/([^\/]+)\/analyze$/);
+        if (analysisMatch && req.method === 'POST') {
+          return await createNewAnalysis(req);
+        }
+
+        return new Response(
+          JSON.stringify({ message: 'Endpoint not found' }),
+          { status: 404 }
+        );
+
+      } catch (error) {
+        console.error('Server error:', error);
+        return new Response(
+          JSON.stringify({ message: 'Internal server error' }),
+          { status: 500 }
+        );
+      }
+    }
+
+
+    return new Response('Not Found', { status: 404 });
   },
   port: process.env.PORT || 3000
 });
+
 
 connectDB()
   .then(() => {
