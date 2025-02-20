@@ -1,5 +1,5 @@
-import lighthouse from "lighthouse";
 import * as chromeLauncher from "chrome-launcher";
+import lighthouse from "lighthouse";
 import WebsiteAnalysis from "../models/webAnalysisModel";
 import Website from "../models/webModel";
 
@@ -74,7 +74,8 @@ const createNewAnalysis = async (req: Request): Promise<Response> => {
     const body = await req.json();
     const { url, name } = body;
 
-    let website;
+    //TODO
+				let website;
 
     if (id) {
       website = await Website.findById(id);
@@ -131,20 +132,33 @@ const createNewAnalysis = async (req: Request): Promise<Response> => {
 
 const runLighthouseAnalysis = async (url: string) => {
   try {
-    const chrome = await chromeLauncher.launch({ chromeFlags: ["--headless"] });
 
-    const options = { logLevel: "info", output: "json", port: chrome.port };
-    const result = await lighthouse(url, options);
+    const chromePath = process.env.CHROME_PATH;
 
-    await chrome.kill();
+				if (!chromePath) {
+					throw new Error("Chrome path not found");
+				}
 
-    return {
-      seoScore: result.lhr.categories.seo.score * 100,
-      performanceScore: result.lhr.categories.performance.score * 100,
-      accessibilityScore: result.lhr.categories.accessibility.score * 100,
-      bestPracticeScore: result.lhr.categories["best-practices"].score * 100,
-      fullReport: result.lhr,
-    };
+				const chrome = await chromeLauncher.launch({
+					chromeFlags: ["--headless"],
+					chromePath: chromePath,
+				});
+
+				const options = { logLevel: "info", output: "json", port: chrome.port };
+				//@ts-expect-error: lighthouse types are incorrect
+				const result = await lighthouse(url, options);
+
+				await chrome.kill();
+
+				//TODO
+				return {
+					seoScore: result.lhr.categories.seo.score * 100,
+					performanceScore: result.lhr.categories.performance.score * 100,
+					accessibilityScore: result.lhr.categories.accessibility.score * 100,
+					bestPracticeScore:
+						result.lhr.categories["best-practices"].score * 100,
+					fullReport: result.lhr,
+				};
   } catch (error) {
     console.error("Error running Lighthouse analysis:", error);
     throw new Error("Lighthouse analysis failed");
