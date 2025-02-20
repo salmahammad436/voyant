@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv';
+import { config } from "dotenv";
 import index from "./public/index.html";
 import connectDB from "./src/config/db";
 import {
@@ -6,7 +6,7 @@ import {
 	getAllWebsites,
 	getOneById,
 } from "./src/controllers";
-dotenv.config();
+config();
 
 
 Bun.serve({
@@ -22,10 +22,12 @@ Bun.serve({
 		switch (`${req.method} ${path}`) {
 			case "GET /api/websites":
 				return await getAllWebsites(req);
+			//TODO: Explain the code below
 			case `GET /api/websites/${url.pathname.split("/").slice(3).join("/")}`:
 				return await getOneById(req);
 			case `POST /api/websites/${url.pathname.split("/").slice(3).join("/")}`:
 				return await createNewAnalysis(req);
+			//END TODO
 			default:
 				return new Response("Not Found", { status: 404 });
 		}
