@@ -17,15 +17,18 @@ Bun.serve({
 	async fetch(req: Request): Promise<Response> {
 		const url = new URL(req.url);
 		const path = url.pathname;
+		const urlPath=()=>{
+			return `/api/websites/${url.pathname.split("/").slice(3).join("/")}`
+		}
 
 		// API routes
 		switch (`${req.method} ${path}`) {
 			case "GET /api/websites":
 				return await getAllWebsites(req);
-			//TODO: Explain the code below
-			case `GET /api/websites/${url.pathname.split("/").slice(3).join("/")}`:
+			
+			case `GET ${urlPath()}`:
 				return await getOneById(req);
-			case `POST /api/websites/${url.pathname.split("/").slice(3).join("/")}`:
+			case `POST ${urlPath()}`:
 				return await createNewAnalysis(req);
 			//END TODO
 			default:

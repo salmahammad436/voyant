@@ -2,7 +2,8 @@ import * as chromeLauncher from "chrome-launcher";
 import lighthouse from "lighthouse";
 import WebsiteAnalysis from "../models/webAnalysisModel";
 import Website from "../models/webModel";
-
+import type { AnalysisData } from "../../interfaces/anaResult";
+import puppeteer from "puppeteer";
 
 // Get all websites
 const getAllWebsites = async (req: Request): Promise<Response> => {
@@ -26,8 +27,7 @@ const getAllWebsites = async (req: Request): Promise<Response> => {
 // Get one website by ID
 const getOneById = async (req: Request): Promise<Response> => {
   const url = new URL(req.url);
-  const id = url.pathname.split("/").pop();
-
+  const id = url.pathname.match(/\/api\/websites\/([^\/]+)/)?.[1];
   if (!id) {
     return new Response(JSON.stringify({ message: "Missing ID" }), {
       status: 400,
@@ -35,13 +35,10 @@ const getOneById = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // const objectId = new Types.ObjectId(id);
     const websiteAnalysis = await WebsiteAnalysis.findOne({ websiteId: id });
 
     if (!websiteAnalysis) {
-      console.error(
-        `Error with websiteId ${id}`,
-      );
+      console.error(`Error with websiteId ${id}`);
       return new Response(
         JSON.stringify({ message: "Website Analysis not found" }),
         { status: 404 }
@@ -69,13 +66,11 @@ const getOneById = async (req: Request): Promise<Response> => {
 const createNewAnalysis = async (req: Request): Promise<Response> => {
   try {
     const urlObj = new URL(req.url);
-    const id = urlObj.pathname.split("/").pop();
-
+    const id = urlObj.pathname.match(/\/api\/websites\/([^\/]+)/)?.[1];
     const body = await req.json();
     const { url, name } = body;
 
-    //TODO
-				let website;
+    let website;
 
     if (id) {
       website = await Website.findById(id);
@@ -130,35 +125,40 @@ const createNewAnalysis = async (req: Request): Promise<Response> => {
   }
 };
 
-const runLighthouseAnalysis = async (url: string) => {
+const runLighthouseAnalysis = async (url: string): Promise<AnalysisData> => {
+  let browser;
+
   try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      dumpio: true,
+    });
 
-    const chromePath = process.env.CHROME_PATH;
+    const { port } = new URL(browser.wsEndpoint());
+    const options = { logLevel: "info", output: "json", port };
+    // @ts-ignore: lighthouse types might be incorrect
+    const result = await lighthouse(url, options);
 
-				if (!chromePath) {
-					throw new Error("Chrome path not found");
-				}
+    if (!result || !result.lhr) {
+      throw new Error("Lighthouse result is undefined or invalid.");
+    }
 
-				const chrome = await chromeLauncher.launch({
-					chromeFlags: ["--headless"],
-					chromePath: chromePath,
-				});
-
-				const options = { logLevel: "info", output: "json", port: chrome.port };
-				//@ts-expect-error: lighthouse types are incorrect
-				const result = await lighthouse(url, options);
-
-				await chrome.kill();
-
-				//TODO
-				return {
-					seoScore: result.lhr.categories.seo.score * 100,
-					performanceScore: result.lhr.categories.performance.score * 100,
-					accessibilityScore: result.lhr.categories.accessibility.score * 100,
-					bestPracticeScore:
-						result.lhr.categories["best-practices"].score * 100,
-					fullReport: result.lhr,
-				};
+    return {
+      seoScore: result.lhr.categories?.seo?.score
+        ? result.lhr.categories.seo.score * 100
+        : 0,
+      performanceScore: result.lhr.categories?.performance?.score
+        ? result.lhr.categories.performance.score * 100
+        : 0,
+      accessibilityScore: result.lhr.categories?.accessibility?.score
+        ? result.lhr.categories.accessibility.score * 100
+        : 0,
+      bestPracticeScore: result.lhr.categories?.["best-practices"]?.score
+        ? result.lhr.categories["best-practices"].score * 100
+        : 0,
+      fullReport: result.lhr,
+    } as AnalysisData;
   } catch (error) {
     console.error("Error running Lighthouse analysis:", error);
     throw new Error("Lighthouse analysis failed");

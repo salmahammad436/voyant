@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 //TODO
-import type { AnalysisData } from "../interfaces/anaResult.ts";
+import type { AnalysisData } from "../../interfaces/anaResult"
 
 const AnalysisCard: React.FC = () => {
 	const [analysisData, setAnalysisData] = useState<AnalysisData[]>([]);
