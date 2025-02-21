@@ -1,4 +1,3 @@
-import * as chromeLauncher from "chrome-launcher";
 import lighthouse from "lighthouse";
 import WebsiteAnalysis from "../models/webAnalysisModel";
 import Website from "../models/webModel";
@@ -8,7 +7,8 @@ import puppeteer from "puppeteer";
 // Get all websites
 const getAllWebsites = async (req: Request): Promise<Response> => {
   try {
-    const websites = await WebsiteAnalysis.find();
+    //here I am trying to populate the name of website from websiIte
+    const websites = await WebsiteAnalysis.find().populate("websiteId", "name");
     return new Response(JSON.stringify(websites), {
       headers: { "Content-Type": "application/json" },
     });
