@@ -1,8 +1,6 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 import Input from "./inputs";
-
-
 
 const AnalysisForm: React.FC = () => {
   const [name, setName] = useState("");
@@ -11,17 +9,23 @@ const AnalysisForm: React.FC = () => {
 
   const handleAnalyze = async () => {
     if (!url || !name) {
-      setMessage({text: "Please enter both the website name and URL😒", type: 'error'});
-      return;
-    }
-    try {
-      await axios.post("/api/websites/", { name, url });
-      setMessage({text: "Analysis completed successfully! Website added to the list👌", type: 'success'});
-      setName("");
-      setUrl("");
-    } catch (error: any) {
-      setMessage({text: "Failed to analyze website😥", type: 'error'});
-    }
+					setMessage({
+						text: "Please enter both the website name and URL😒",
+						type: "error",
+					});
+					return;
+				}
+				try {
+					await axios.post("/api/websites/", { name, url });
+					setMessage({
+						text: "Analysis completed successfully! Website added to the list👌",
+						type: "success",
+					});
+					setName("");
+					setUrl("");
+				} catch (error) {
+					setMessage({ text: "Failed to analyze website😥", type: "error" });
+				}
   };
   return (
     <div className="bg-white p-5 rounded-lg shadow-md">

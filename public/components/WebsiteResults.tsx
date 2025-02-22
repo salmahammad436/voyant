@@ -1,7 +1,5 @@
-import type{ WebsiteResultsProps} from "../../interfaces/anaResult";
+import type { WebsiteResultsProps } from "../../interfaces/anaResult";
 import WebsiteScoreCard from "./card";
-
-
 
 const WebsiteResults: React.FC<WebsiteResultsProps> = ({ analysisData, loading }) => {
   return (

@@ -7,4 +7,6 @@ const WebsiteSchema = new Schema({
 
 const Website = mongoose.model("Website", WebsiteSchema);
 
+export type WebsiteType = typeof Website;
+
 export default Website;

@@ -8,7 +8,6 @@ import {
 } from "./src/controllers";
 config();
 
-
 Bun.serve({
 	static: {
 		"/": index,
@@ -17,20 +16,19 @@ Bun.serve({
 	async fetch(req: Request): Promise<Response> {
 		const url = new URL(req.url);
 		const path = url.pathname;
-		const urlPath=()=>{
-			return `/api/websites/${url.pathname.split("/").slice(3).join("/")}`
-		}
+		const urlPath = () => {
+			return `/api/websites/${url.pathname.split("/").slice(3).join("/")}`;
+		};
 
 		// API routes
 		switch (`${req.method} ${path}`) {
 			case "GET /api/websites":
 				return await getAllWebsites(req);
-			
+
 			case `GET ${urlPath()}`:
 				return await getOneById(req);
 			case `POST ${urlPath()}`:
 				return await createNewAnalysis(req);
-			//END TODO
 			default:
 				return new Response("Not Found", { status: 404 });
 		}
@@ -38,12 +36,4 @@ Bun.serve({
 	port: process.env.PORT || 3000,
 });
 
-
-connectDB()
-  .then(() => {
-    console.log(`Server & Database running on port ${process.env.PORT || 3000}`);
-  })
-  .catch((error) => {
-    console.error('Database connection failed:', error);
-    process.exit(1);
-  })
+connectDB();
