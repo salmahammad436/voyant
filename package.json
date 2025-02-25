@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"@tanstack/react-query": "^5.66.9",
 		"axios": "^1.7.9",
 		"biome": "^0.3.3",
 		"bun-plugin-tailwind": "^0.0.14",

@@ -1,11 +1,18 @@
 import type { WebsiteResultsProps } from "../../interfaces/anaResult";
 import WebsiteScoreCard from "./card";
+import { useState } from "react";
 
 const WebsiteResults: React.FC<WebsiteResultsProps> = ({ analysisData, loading }) => {
+  const [expandedWebsiteId, setExpandedWebsiteId] = useState<string | null>(null);
+
+  const toggleHistory = (websiteId: string) => {
+    setExpandedWebsiteId((prev) => (prev === websiteId ? null : websiteId));
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-semibold mb-6">Website Analysis Results</h2>
-      
+
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -16,8 +23,31 @@ const WebsiteResults: React.FC<WebsiteResultsProps> = ({ analysisData, loading }
         </p>
       ) : (
         <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
-          {analysisData.map((data) => (
-            <WebsiteScoreCard key={data._id} data={data} />
+          {analysisData.map((website) => (
+            <div key={website._id} className="border-b pb-4 mb-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">
+                  {website.name || `Website Name`}
+                </h3>
+                <button
+                  onClick={() => toggleHistory(website._id)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                >
+                  {expandedWebsiteId === website._id ? "Hide History" : "Show History"}
+                </button>
+              </div>
+
+              {expandedWebsiteId === website._id && (
+                <div className="mt-4 space-y-4">
+                  {website.AnalysisData.map((data) => (
+                    <WebsiteScoreCard
+                      key={data._id}
+                      data={{ ...data, websiteId: { name: "" } }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       )}
