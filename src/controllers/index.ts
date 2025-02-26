@@ -29,7 +29,6 @@ const getAllWebsites = async (req: Request): Promise<Response> => {
 const getOneById = async (req: Request): Promise<Response> => {
   try {
     const urlObj = new URL(req.url);
-
     const pathParts = urlObj.pathname.split('/');
     const id = pathParts[3];
     if (!id) {
@@ -87,8 +86,11 @@ const createNewAnalysis = async (req: Request): Promise<Response> => {
     } else {
       website.AnalysisData.push(analysis._id as Types.ObjectId);
     }
-    await website.save(); 
-    return new Response(JSON.stringify(analysis), {
+    return new Response(JSON.stringify({
+      id: website._id,
+      name: website.name,
+      url: website.url
+    }), {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
